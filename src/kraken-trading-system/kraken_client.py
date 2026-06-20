@@ -1,17 +1,12 @@
-from dotenv import load_dotenv
-from kraken.spot import SpotClient
-import os
-
-# Load environment variables
-load_dotenv()
-API_KEY  = os.getenv("API_KEY")
-PRIVATE_KEY = os.getenv("PRIVATE_KEY")
+from kraken.spot import SpotAsyncClient
 
 class KrakenClient:
-    def __init__(self):
+    def __init__(self, key, secret):
         # TO DO: CHECK SpotAsyncClient and async
-        self.client = SpotClient(key=API_KEY, secret=PRIVATE_KEY)
+        self._key = key
+        self._secret = secret
     
-    def get_balance(self):
-        return self.client.request("POST", "/0/private/Balance")
+    async def get_balance(self):
+        async with SpotAsyncClient(key=self._key, secret=self._secret) as client:
+            return await client.request("POST", "/0/private/Balance")
 

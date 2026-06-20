@@ -1,29 +1,43 @@
-import threading
-import time
-from queue import Queue
+from dotenv import load_dotenv
+import asyncio
+import os
 
 from websocket_feed import KrakenWS
 from kraken_client import KrakenClient
 
-def strategy_loop(q, client):
-    while True:
-        msg = q.get()
-        print("Received:",msg)
 
-        # Placeholder logic
-        # e.g. if signal: client.place_order(...)
+# Load environment variables
+load_dotenv()
+API_KEY  = os.getenv("API_KEY")
+PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 
 
-def main():
-    q = Queue()
-    client = KrakenClient()
-    ws = KrakenWS(q)
+async def main():
+    client = KrakenClient(API_KEY, PRIVATE_KEY)
+    ws = KrakenWS(key=API_KEY, secret=PRIVATE_KEY)
 
-    threading.Thread(target=ws.start, daemon=True).start()
-    threading.Thread(target=strategy_loop, args=(q,client), daemon=True).start()
+    await ws.start()
 
-    while True:
-        time.sleep(5)
+    try:
+        await ws.subscribe(params={
+            "channel": "book",
+            "symbol": ["BTC/USD"],
+            "depth": 10
+        })
+
+        await ws.subscribe(params={
+            "channel": "trade",
+            "symbol": ["BTC/USD"]
+        })
+
+        while not ws.exception_occur:
+            await asyncio.sleep(5)
+    finally:
+        await ws.close()
+
 
 if __name__ == "__main__":
-    main()
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass
