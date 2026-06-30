@@ -3,14 +3,15 @@ import asyncio
 import os
 
 from kraken_client import KrakenClient
-from websocket_feed import KrakenWS, book, symbol
-
+from websocket_feed import KrakenWS
 
 
 # Load environment variables
 load_dotenv()
 API_KEY  = os.getenv("API_KEY")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
+
+currencies = ["BTC/USD", "XRP/USD"]
 
 
 async def main():
@@ -20,15 +21,13 @@ async def main():
     await ws.start()
 
     try:
-        await ws.subscribe(params={
-            "channel": "book",
-            "symbol": [symbol],
-            "depth": 10
-        })
+        currency_info = await client.get_currency_info()
+        ws.configure(currencies, currency_info)
 
         await ws.subscribe(params={
-            "channel": "trade",
-            "symbol": [symbol]
+            "channel": "book",
+            "symbol": currencies,
+            "depth": 10
         })
 
         while not ws.exception_occur:

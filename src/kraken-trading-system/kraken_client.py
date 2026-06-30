@@ -10,3 +10,13 @@ class KrakenClient:
         async with SpotAsyncClient(key=self._key, secret=self._secret) as client:
             return await client.request("POST", "/0/private/Balance")
 
+    async def get_currency_info(self) -> dict:
+        """Gets currency information for BTC/USD and XRP/USD,
+        e.g. decimal places for quantity/price."""
+        async with SpotAsyncClient(key=self._key, secret=self._secret) as client:
+            asset_pairs = dict(await client.request("GET", "/0/public/AssetPairs"))
+            currencies = {
+                "BTC/USD": asset_pairs["XXBTZUSD"],
+                "XRP/USD": asset_pairs["XXRPZUSD"]
+            }
+            return currencies
