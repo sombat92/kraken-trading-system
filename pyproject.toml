@@ -10,6 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 
 dependencies = [
+    "sortedcontainers>=2.4.0,<3.0.0
     "python-dotenv>=1.0.0,<2.0.0",
     "python-kraken-sdk>=3.2.0,<4.0.0",
     "websocket-client>=1.9.0,<2.0.0"

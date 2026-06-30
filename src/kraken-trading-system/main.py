@@ -2,8 +2,9 @@ from dotenv import load_dotenv
 import asyncio
 import os
 
-from websocket_feed import KrakenWS
 from kraken_client import KrakenClient
+from websocket_feed import KrakenWS, book, symbol
+
 
 
 # Load environment variables
@@ -21,17 +22,18 @@ async def main():
     try:
         await ws.subscribe(params={
             "channel": "book",
-            "symbol": ["BTC/USD"],
+            "symbol": [symbol],
             "depth": 10
         })
 
         await ws.subscribe(params={
             "channel": "trade",
-            "symbol": ["BTC/USD"]
+            "symbol": [symbol]
         })
 
         while not ws.exception_occur:
             await asyncio.sleep(5)
+    
     finally:
         await ws.close()
 
