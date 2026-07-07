@@ -16,15 +16,15 @@ class OrderBook:
         self._is_ready = False # Whether first snapshot has been applied yet
         
     @property
-    def best_ask(self):
+    def best_ask(self) -> Decimal | None:
         return next(iter(self.asks)) if len(self.asks) > 0 else None
     
     @property
-    def best_bid(self):
+    def best_bid(self) -> Decimal | None:
         return next(iter(self.bids)) if len(self.bids) > 0 else None
 
     @property
-    def mid(self):
+    def mid(self) -> Decimal | None:
         """Midpoint between best ask and best bid"""
         if len(self.asks) > 0 and len(self.bids) > 0:
             return (self.best_ask + self.best_bid) / 2
@@ -32,7 +32,7 @@ class OrderBook:
             return None
     
     @property
-    def spread(self):
+    def spread(self) -> Decimal | None:
         """Difference between best ask and best bid"""
         if len(self.asks) > 0 and len(self.bids) > 0:
             return self.best_ask - self.best_bid
@@ -122,6 +122,6 @@ class OrderBook:
                 if actual_checksum != computed_checksum:
                     self._is_ready = False
                     print(f"WARNING: Computed checksum ({computed_checksum}) does not equal actual checksum ({actual_checksum}).")
-                self.update_no = 1
+                self.update_no = 0
             else:
                 self.update_no += 1

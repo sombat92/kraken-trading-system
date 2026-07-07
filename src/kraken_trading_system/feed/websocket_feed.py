@@ -1,5 +1,5 @@
 from kraken.spot import SpotWSClient
-from order_book import OrderBook
+from .order_book import OrderBook
 
 class KrakenWS(SpotWSClient):
     def __init__(self, key, secret):

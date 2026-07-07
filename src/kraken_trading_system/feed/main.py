@@ -1,10 +1,11 @@
 from dotenv import load_dotenv
 import asyncio
-import config
 import os
 
-from kraken_client import KrakenClient
-from websocket_feed import KrakenWS
+from .kraken_client import KrakenClient
+from .websocket_feed import KrakenWS
+from ...kraken_trading_system import config
+
 
 
 # Load environment variables
@@ -20,7 +21,7 @@ async def main():
 
     try:
         currency_info = await client.get_currency_info()
-        ws.configure(currencies, currency_info)
+        ws.configure(config.SYMBOLS, currency_info)
 
         await ws.subscribe(params={
             "channel": "book",
