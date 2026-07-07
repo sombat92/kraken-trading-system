@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import asyncio
+import config
 import os
 
 from kraken_client import KrakenClient
@@ -10,9 +11,6 @@ from websocket_feed import KrakenWS
 load_dotenv()
 API_KEY  = os.getenv("API_KEY")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
-
-currencies = ["BTC/USD", "XRP/USD"]
-
 
 async def main():
     client = KrakenClient(API_KEY, PRIVATE_KEY)
@@ -26,8 +24,8 @@ async def main():
 
         await ws.subscribe(params={
             "channel": "book",
-            "symbol": currencies,
-            "depth": 10
+            "symbol": config.SYMBOLS,
+            "depth": config.DEPTH
         })
 
         while not ws.exception_occur:

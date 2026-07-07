@@ -18,7 +18,8 @@ class KrakenWS(SpotWSClient):
                 c,
                 self.currency_info[c]["pair_decimals"],
                 self.currency_info[c]["lot_decimals"]
-            ) for c in self.currencies
+            )
+            for c in self.currencies
         }
 
     async def on_message(self, message: dict):
