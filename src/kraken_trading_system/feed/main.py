@@ -5,6 +5,7 @@ import os
 from .kraken_client import KrakenClient
 from .websocket_feed import KrakenWS
 from ...kraken_trading_system import config
+from ...kraken_trading_system.execution.executor import Executor
 
 
 
@@ -22,6 +23,12 @@ async def main():
     try:
         currency_info = await client.get_currency_info()
         ws.configure(config.SYMBOLS, currency_info)
+
+        executor = Executor(client)
+
+        #print(await client.place_order("buy", 2, 109.2, "BTC/USD"))
+        #print(await executor.place("BTC/USD", "buy", 1.2, 2.3))
+        await executor.refresh_quotes("XBTUSD", 1.5, 1.6, 2)
 
         await ws.subscribe(params={
             "channel": "book",
