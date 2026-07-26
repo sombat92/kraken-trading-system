@@ -1,3 +1,4 @@
+from decimal import Decimal
 from kraken.spot import SpotAsyncClient
 
 class KrakenClient:
@@ -21,7 +22,7 @@ class KrakenClient:
             }
             return currencies
     
-    async def place_order(self, action: str, volume: float, price: float, pair: str, validate: bool = True):
+    async def place_order(self, action: str, volume: Decimal, price: Decimal, pair: str, validate: bool = True):
         """Places order.
         :param str action: either 'buy' or 'sell'.
         """
