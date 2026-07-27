@@ -65,6 +65,9 @@ class KrakenWS(SpotWSClient):
 
 
     async def _quote_loop(self, pair: str):
-        while True:
-            await self.books[pair].refresh_quotes()
-            await asyncio.sleep(config.REBALANCE_INTERVAL)
+        try:
+            while True:
+                await self.books[pair].refresh_quotes()
+                await asyncio.sleep(config.REBALANCE_INTERVAL)
+        except asyncio.CancelledError:
+            return
