@@ -1,6 +1,7 @@
 from ...kraken_trading_system import config
 from ...kraken_trading_system.feed.order_book import OrderBook
 from decimal import Decimal
+from typing import Any
 import uuid
 
 class PaperEngine:
@@ -39,14 +40,14 @@ class PaperEngine:
         self.open_orders.pop(order_id)
     
 
-    def check_fills(self, book: OrderBook):
+    def check_fills(self, book: OrderBook) -> dict[str, dict[str, Any]]:
         """Checks if any resting orders get crossed. If so, execute the order. Called on every book update."""
-        filled = []
+        filled = {}
         for order_id, order in self.open_orders.items():
             # If there is a willing buyer/seller, execute the order
             if (order["action"] == "buy" and book.best_ask < order["price"]) or (order["action"] == "sell" and book.best_bid > order["price"]):
                 self._execute(order)
-                filled.append(order_id)
+                filled[order_id] = order
 
         # Clears filled orders from open orders dict
         for order_id in filled:
