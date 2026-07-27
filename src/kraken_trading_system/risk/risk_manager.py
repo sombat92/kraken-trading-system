@@ -33,4 +33,19 @@ class RiskManager:
         """Returns position for a given pair."""
         return self.positions.get(pair, Decimal(0))
 
-    def 
+    def can_quote(self, action: str, volume_usd: Decimal, pair: str) -> bool:
+        """Returns whether a given order would cause max position to be breached by a given pair."""
+        if self.halted:
+            return False
+        
+        position = self.get_position(pair)
+        if action == "buy":
+            projected = position + volume_usd
+        else:
+            projected = position - volume_usd
+
+        if abs(projected) > self.max_position:
+            print(f"Position limit would be breached with the {action} action for {pair}: ${projected}")
+            return False
+        else:
+            return True
