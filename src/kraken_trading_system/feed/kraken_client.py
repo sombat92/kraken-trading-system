@@ -1,17 +1,21 @@
 from decimal import Decimal
-from kraken.spot import SpotAsyncClient
+from kraken.spot import SpotAsyncClient, User
+import time
 
 class KrakenClient:
     def __init__(self, key: str, secret: str):
         # TO DO: CHECK SpotAsyncClient and async
         self._key = key
         self._secret = secret
-    
-    async def get_balance(self):
-        async with SpotAsyncClient(key=self._key, secret=self._secret) as client:
-            return await client.request("POST", "/0/private/Balance")
+        self.user = User(key=key, secret=secret)
 
-    async def get_currency_info(self) -> dict:
+
+    def get_balance(self, currency: str) -> Decimal:
+        """Gets user balance in the given currency."""
+        return Decimal(str(self.user.get_balance(currency)["available_balance"]))
+
+
+    async def get_currency_info(self) -> dict[str, dict]:
         """Gets currency information for BTC/USD and XRP/USD,
         e.g. decimal places for quantity/price."""
         async with SpotAsyncClient(key=self._key, secret=self._secret) as client:
@@ -21,7 +25,8 @@ class KrakenClient:
                 "XRP/USD": asset_pairs["XXRPZUSD"]
             }
             return currencies
-    
+
+
     async def place_order(self, action: str, volume: Decimal, price: Decimal, pair: str, validate: bool = True):
         """Places order.
         :param str action: either 'buy' or 'sell'.
@@ -36,13 +41,15 @@ class KrakenClient:
         }
         async with SpotAsyncClient(key=self._key, secret=self._secret) as client:
             return await client.request("POST", "/0/private/AddOrder", params=params)
-    
+
+
     async def cancel_order(self, txid: str):
         """Cancels an open order with a given txid."""
         params = {"txid": txid}
         async with SpotAsyncClient(key=self._key, secret=self._secret) as client:
             return await client.request("POST", "/0/private/CancelOrder", params=params)
-    
+
+
     async def cancel_all_orders(self):
         """Cancels all orders."""
         async with SpotAsyncClient(key=self._key, secret=self._secret) as client:

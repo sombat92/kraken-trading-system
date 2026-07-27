@@ -19,11 +19,11 @@ class PaperEngine:
         if order["side"] == "buy":
             # Completes buy order
             self.balance_usd -= cost
-            self.positions[order["pair"]] = self.positions.get(order["pair"], Decimal(0)) + (1 - config.MAKER_FEE) * order["size"] # Adjusts balance available in that currency
+            self.positions[order["pair"]] = self.positions.get(order["pair"], Decimal(0)) + (1 - config.MAKER_FEE) * order["volume"] # Adjusts balance available in that currency
         else:
             # Completes sell order
             self.balance_usd += cost
-            self.positions[order["pair"]] = self.positions.get(order["pair"], Decimal(0)) - (1 - config.MAKER_FEE) * order["size"]
+            self.positions[order["pair"]] = self.positions.get(order["pair"], Decimal(0)) - (1 - config.MAKER_FEE) * order["volume"]
 
     
     def place_order(self, action: str, volume: Decimal, price: Decimal, pair: str) -> str:
@@ -45,7 +45,7 @@ class PaperEngine:
         filled = {}
         for order_id, order in self.open_orders.items():
             # If there is a willing buyer/seller, execute the order
-            if (order["action"] == "buy" and book.best_ask < order["price"]) or (order["action"] == "sell" and book.best_bid > order["price"]):
+            if (order["action"] == "buy" and book.best_ask <= order["price"]) or (order["action"] == "sell" and book.best_bid >= order["price"]):
                 self._execute(order)
                 filled[order_id] = order
 

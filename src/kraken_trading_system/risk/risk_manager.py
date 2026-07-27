@@ -25,9 +25,9 @@ class RiskManager:
         """Updates position based on given order."""
         cost = volume * price
         if action == "buy":
-            self.positions[pair] = self.positions.get(pair, Decimal(0)) - cost
-        else:
             self.positions[pair] = self.positions.get(pair, Decimal(0)) + cost
+        else:
+            self.positions[pair] = self.positions.get(pair, Decimal(0)) - cost
 
     def get_position(self, pair: str) -> Decimal:
         """Returns position for a given pair."""

@@ -1,19 +1,28 @@
+from ...kraken_trading_system import config
+from ...kraken_trading_system.risk.risk_manager import RiskManager
 from decimal import Decimal
 from itertools import islice
 from sortedcontainers import SortedDict
 import zlib
 
 class OrderBook:
-    def __init__(self, symbol: str, price_decimals: int, qty_decimals: int, depth: int = 10, checksum_check: int = 10):
+    def __init__(self, symbol: str, price_decimals: int, qty_decimals: int, client, paper_engine, market_maker, executor, depth: int = 10, checksum_check: int = 10):
         self.asks = SortedDict(lambda k: k)
         self.bids = SortedDict(lambda k: -k)
         self.symbol = symbol
         self.price_decimals = price_decimals
         self.qty_decimals = qty_decimals
+        self.client = client
+        self.paper_engine = paper_engine
+        self.market_maker = market_maker
+        self.executor = executor
+        self.risk_manager = RiskManager()
         self.depth = depth
         self.checksum_check = checksum_check # Check checksum validity every X updates
         self.update_no = 0
         self._is_ready = False # Whether first snapshot has been applied yet
+        self.risk_manager.set_starting_capital(self.user_balance)
+
         
     @property
     def best_ask(self) -> Decimal | None:
@@ -38,6 +47,13 @@ class OrderBook:
             return self.best_ask - self.best_bid
         else:
             return None
+
+    @property
+    def user_balance(self) -> Decimal:
+        if config.PAPER_MODE:
+            return self.paper_engine.balance_usd
+        else:
+            return self.client.get_balance(config.SYMBOLS_API[self.symbol])
     
 
     def _truncate(self) -> None:
@@ -111,6 +127,7 @@ class OrderBook:
                     self.bids.pop(price, None)
             
             self._truncate() # Truncates bids and asks
+            self.paper_engine.check_fills(self) # Executes orders on paper engine if filled
 
             # Output key properties
             print(f"UPDATE ({self.symbol}): Best bid: {self.best_bid}, Best ask: {self.best_ask}, Mid: {self.mid}, Spread: {self.spread}")
@@ -125,3 +142,14 @@ class OrderBook:
                 self.update_no = 0
             else:
                 self.update_no += 1
+
+    
+    async def refresh_quotes(self):
+        """Computes the quotes from the strategy market maker, and passes them to the order executor.
+        Then checks whether the daily loss has been executed, and if so trading is halted."""
+        if not self._is_ready or self.mid is None:
+            return
+        
+        bid, ask = self.market_maker.compute_quotes(self, self.risk_manager.get_position(self.symbol))
+        await self.executor.refresh_quotes(self.symbol, bid, ask, config.ORDER_SIZE_USD)
+        self.risk_manager.check_daily_loss(self.user_balance)

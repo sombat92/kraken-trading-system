@@ -18,7 +18,7 @@ class PnLTracker:
         """Writes each filled order to the CSV file."""
         with open(self.filepath, "a+") as file:
             writer = csv.DictWriter(file, fieldnames=self.fieldnames)
-            for order in new_fills:
+            for order in new_fills.values():
                 if order["action"] == "buy":
                     self.total_pnl -= order["price"] * order["volume"]
                 else:
@@ -44,7 +44,7 @@ class PnLTracker:
 
             for row in reader:
                 total_fills += 1
-                total_fees += row["fee"]
+                total_fees += float(row["fee"])
 
         gross_pnl = self.total_pnl + total_fees
         print(f"Total fills: {total_fills}\nTotal fees paid:{total_fees}\nGross PnL:{gross_pnl}\nNet PnL: {self.total_pnl}")
