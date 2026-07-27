@@ -37,7 +37,7 @@ class PaperEngine:
 
     def cancel_order(self, order_id: str):
         """Cancels an order with a given order ID on the paper engine."""
-        self.open_orders.pop(order_id)
+        self.open_orders.pop(order_id, None)
     
 
     def check_fills(self, book: OrderBook) -> dict[str, dict[str, Any]]:

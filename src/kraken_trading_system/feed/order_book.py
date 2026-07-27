@@ -6,7 +6,7 @@ from sortedcontainers import SortedDict
 import zlib
 
 class OrderBook:
-    def __init__(self, symbol: str, price_decimals: int, qty_decimals: int, client, paper_engine, market_maker, executor, depth: int = 10, checksum_check: int = 10):
+    def __init__(self, symbol: str, price_decimals: int, qty_decimals: int, client, paper_engine, market_maker, executor, pnl_tracker, depth: int = 10, checksum_check: int = 10):
         self.asks = SortedDict(lambda k: k)
         self.bids = SortedDict(lambda k: -k)
         self.symbol = symbol
@@ -16,6 +16,7 @@ class OrderBook:
         self.paper_engine = paper_engine
         self.market_maker = market_maker
         self.executor = executor
+        self.pnl_tracker = pnl_tracker
         self.risk_manager = RiskManager()
         self.depth = depth
         self.checksum_check = checksum_check # Check checksum validity every X updates
@@ -49,6 +50,7 @@ class OrderBook:
             return None
 
     @property
+    # NOTE: Calling this from async self.refresh_quotes() will block event loop if paper mode is off
     def user_balance(self) -> Decimal:
         if config.PAPER_MODE:
             return self.paper_engine.balance_usd
@@ -127,7 +129,8 @@ class OrderBook:
                     self.bids.pop(price, None)
             
             self._truncate() # Truncates bids and asks
-            self.paper_engine.check_fills(self) # Executes orders on paper engine if filled
+            fills = self.paper_engine.check_fills(self) # Gets filled orders on paper engine to be exxecuted
+            self.pnl_tracker.write_fills(fills) # Writes filled orders to PnL tracker
 
             # Output key properties
             print(f"UPDATE ({self.symbol}): Best bid: {self.best_bid}, Best ask: {self.best_ask}, Mid: {self.mid}, Spread: {self.spread}")

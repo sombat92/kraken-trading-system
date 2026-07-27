@@ -1,6 +1,5 @@
 from decimal import Decimal
 from kraken.spot import SpotAsyncClient, User
-import time
 
 class KrakenClient:
     def __init__(self, key: str, secret: str):

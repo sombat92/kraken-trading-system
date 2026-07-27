@@ -1,6 +1,7 @@
 from ...kraken_trading_system import config
 from ...kraken_trading_system.execution.executor import Executor
 from ...kraken_trading_system.paper.paper_engine import PaperEngine
+from ...kraken_trading_system.pnl.pnl_tracker import PnLTracker
 from ...kraken_trading_system.strategy.market_maker import MMStrategy
 from .kraken_client import KrakenClient
 from .websocket_feed import KrakenWS
@@ -18,7 +19,8 @@ async def main():
     paper_engine = PaperEngine()
     market_maker = MMStrategy()
     executor = Executor(client, paper_engine)
-    ws = KrakenWS(API_KEY, PRIVATE_KEY, client, paper_engine, market_maker, executor)
+    pnl_tracker = PnLTracker(config.PNL_CSV_FILEPATH)
+    ws = KrakenWS(API_KEY, PRIVATE_KEY, client, paper_engine, market_maker, executor, pnl_tracker)
     print("Initialised user client and websocket feed.")
 
     await ws.start()
@@ -29,8 +31,7 @@ async def main():
         ws.configure(config.SYMBOLS, currency_info)
         print("Configured websocket feed.")
 
-        for pair in config.SYMBOLS:
-            asyncio.create_task(ws._quote_loop(pair))
+        quote_tasks = [asyncio.create_task(ws._quote_loop(pair)) for pair in config.SYMBOLS]
 
         await ws.subscribe(params={
             "channel": "book",
@@ -41,10 +42,13 @@ async def main():
 
         while not ws.exception_occur:
             await asyncio.sleep(5)
-
-    
+  
     finally:
         await executor.cancel_all()
+        for task in quote_tasks:
+            task.cancel()
+        await asyncio.gather(*quote_tasks, return_exceptions=True)
+        await client.client.close()
         await ws.close()
 
 

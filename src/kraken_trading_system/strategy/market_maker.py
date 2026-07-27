@@ -4,7 +4,7 @@ from decimal import Decimal
 
 class MMStrategy:
     """Returns a (bid price, ask price) tuple."""
-    def compute_quotes(self, book: OrderBook, position: Decimal, skew_factor: Decimal = 0.75) -> tuple[Decimal, Decimal]:
+    def compute_quotes(self, book: OrderBook, position: Decimal, skew_factor: Decimal = Decimal("0.75")) -> tuple[Decimal, Decimal]:
         resv_price = book.mid - position * skew_factor
         edge = book.mid * Decimal(str(config.EDGE))
         min_spread = Decimal(str(config.MIN_SPREAD))
