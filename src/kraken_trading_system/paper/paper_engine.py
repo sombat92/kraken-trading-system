@@ -21,7 +21,7 @@ class PaperEngine:
         if order["action"] == "buy":
             # Completes buy order if cost does not exceed balance
             if cost + fee > self.balance_usd:
-                self.logger.warning(f"Fill skipped: insufficient balance ({self.balance_usd}) for total cost ({cost+fee})")
+                self.logger.info(f"Fill skipped: insufficient balance ({self.balance_usd}) for total cost ({cost+fee})")
                 return False
             self.balance_usd -= cost + fee
             self.positions[order["pair"]] = self.positions.get(order["pair"], Decimal(0)) + order["volume"] # Adjusts balance available in that currency
@@ -29,7 +29,7 @@ class PaperEngine:
             # Completes sell order if quantity does not exceed currency held
             held = self.positions.get(order["pair"], Decimal(0)) 
             if order["volume"] > held:
-                self.logger.warning((f"Fill skipped: insufficient {order['pair']} balance ({held}) for order volume {order['volume']}"))
+                self.logger.info((f"Fill skipped: insufficient {order['pair']} balance ({held}) for order volume {order['volume']}"))
                 return False
             self.balance_usd += cost - fee
             self.positions[order["pair"]] = self.positions.get(order["pair"], Decimal(0)) - order["volume"]
@@ -44,12 +44,12 @@ class PaperEngine:
         cost = price * volume
         if action == "buy":
             if cost > self.balance_usd:
-                self.logger.warning(f"Rejected buy {pair}: cost {cost} exceeds balance {self.balance_usd}")
+                self.logger.info(f"Rejected buy {pair}: cost {cost} exceeds balance {self.balance_usd}")
                 return None
         else:
             held = self.positions.get(pair, Decimal(0))
             if volume > held:
-                self.logger.warning(f"Rejected sell {pair}: volume {volume} exceeds held {held}")
+                self.logger.info(f"Rejected sell {pair}: volume {volume} exceeds held {held}")
                 return None
 
         order_id = str(uuid.uuid4())[:8] # 8-character UUID

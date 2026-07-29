@@ -11,11 +11,23 @@ import asyncio
 import logging
 import os
 import time
+import signal
 
 # Load environment variables
 load_dotenv()
 API_KEY  = os.getenv("API_KEY")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
+
+
+async def shutdown(executor: Executor, quote_tasks: list[asyncio.Task], ws: KrakenWS):
+    """Performs a graceful shutdown.
+    Cancels all orders in executor and quote tasks. Finally closes the websocket feed."""
+    await executor.cancel_all()
+    for task in quote_tasks:
+        task.cancel()
+    await asyncio.gather(*quote_tasks, return_exceptions=True)
+    await ws.close()
+
 
 async def main():
     # Configure logging
@@ -30,6 +42,7 @@ async def main():
     m_logger.setLevel(logging.DEBUG)
     m_logger.addHandler(file_handler)
 
+    # Initialise key components
     client = KrakenClient(API_KEY, PRIVATE_KEY)
     paper_engine = PaperEngine(m_logger)
     market_maker = MMStrategy()
@@ -39,16 +52,21 @@ async def main():
     ws = KrakenWS(API_KEY, PRIVATE_KEY, client, paper_engine, market_maker, executor, pnl_tracker, risk_manager, m_logger)
     print("Initialised user client and websocket feed.")
 
+    # Start and configure websocket feed
     await ws.start()
-    print("Started websocket feed.")
+    currency_info = await client.get_currency_info()
+    ws.configure(config.SYMBOLS, currency_info)
+    print("Configured websocket feed.")
+    
+    quote_tasks = [asyncio.create_task(ws._quote_loop(pair)) for pair in config.SYMBOLS]
+
+    # Handle graceful shutdown when run as a background service (using SIGTERM). Not on Windows.
+    if os.name != "nt":
+        loop = asyncio.get_event_loop()
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(sig, lambda: asyncio.create_task(shutdown(executor, quote_tasks, ws)))
 
     try:
-        currency_info = await client.get_currency_info()
-        ws.configure(config.SYMBOLS, currency_info)
-        print("Configured websocket feed.")
-
-        quote_tasks = [asyncio.create_task(ws._quote_loop(pair)) for pair in config.SYMBOLS]
-
         await ws.subscribe(params={
             "channel": "book",
             "symbol": config.SYMBOLS,
@@ -61,11 +79,7 @@ async def main():
             pnl_tracker.summarise()
   
     finally:
-        await executor.cancel_all()
-        for task in quote_tasks:
-            task.cancel()
-        await asyncio.gather(*quote_tasks, return_exceptions=True)
-        await ws.close()
+        await shutdown(executor, quote_tasks, ws)
 
 
 if __name__ == "__main__":
