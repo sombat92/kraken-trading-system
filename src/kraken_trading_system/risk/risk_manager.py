@@ -47,7 +47,7 @@ class RiskManager:
             projected = position - volume_usd
 
         if abs(projected) > self.max_position:
-            self.logger.debug(f"Quote rejected: position limit would be breached with the {action} action for {pair}: ${projected}")
+            self.logger.debug(f"Quote rejected: position limit would be breached with the {action} action for {pair}: c{projected}")
             return False
         else:
             return True

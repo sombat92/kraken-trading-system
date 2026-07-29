@@ -1,5 +1,4 @@
 from ...kraken_trading_system import config
-from ...kraken_trading_system.risk.risk_manager import RiskManager
 from decimal import Decimal
 from itertools import islice
 from logging import Logger
@@ -8,7 +7,7 @@ import zlib
 
 
 class OrderBook:
-    def __init__(self, symbol: str, price_decimals: int, qty_decimals: int, logger: Logger, client, paper_engine, market_maker, executor, pnl_tracker, depth: int = 10, checksum_check: int = 10):
+    def __init__(self, symbol: str, price_decimals: int, qty_decimals: int, logger: Logger, client, paper_engine, market_maker, executor, risk_manager, pnl_tracker, depth: int = 10, checksum_check: int = 10):
         self.asks = SortedDict(lambda k: k)
         self.bids = SortedDict(lambda k: -k)
         self.symbol = symbol
@@ -20,7 +19,7 @@ class OrderBook:
         self.market_maker = market_maker
         self.executor = executor
         self.pnl_tracker = pnl_tracker
-        self.risk_manager = RiskManager(logger)
+        self.risk_manager = risk_manager
         self.depth = depth
         self.checksum_check = checksum_check # Check checksum validity every X updates
         self.update_no = 0

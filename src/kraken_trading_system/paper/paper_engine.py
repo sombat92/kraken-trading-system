@@ -24,7 +24,7 @@ class PaperEngine:
                 self.logger.warning(f"Fill skipped: insufficient balance ({self.balance_usd}) for total cost ({cost+fee})")
                 return False
             self.balance_usd -= cost + fee
-            self.positions[order["pair"]] = self.positions.get(order["pair"], Decimal(0)) + (1 - config.MAKER_FEE) * order["volume"] # Adjusts balance available in that currency
+            self.positions[order["pair"]] = self.positions.get(order["pair"], Decimal(0)) + order["volume"] # Adjusts balance available in that currency
         else:
             # Completes sell order if quantity does not exceed currency held
             held = self.positions.get(order["pair"], Decimal(0)) 
@@ -32,7 +32,7 @@ class PaperEngine:
                 self.logger.warning((f"Fill skipped: insufficient {order['pair']} balance ({held}) for order volume {order['volume']}"))
                 return False
             self.balance_usd += cost - fee
-            self.positions[order["pair"]] = self.positions.get(order["pair"], Decimal(0)) - (1 - config.MAKER_FEE) * order["volume"]
+            self.positions[order["pair"]] = self.positions.get(order["pair"], Decimal(0)) - order["volume"]
 
         self.total_fee += fee
         return True

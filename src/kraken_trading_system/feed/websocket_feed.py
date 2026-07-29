@@ -2,6 +2,7 @@ from ...kraken_trading_system import config
 from ...kraken_trading_system.execution.executor import Executor
 from ...kraken_trading_system.paper.paper_engine import PaperEngine
 from ...kraken_trading_system.pnl.pnl_tracker import PnLTracker
+from ...kraken_trading_system.risk.risk_manager import RiskManager
 from ...kraken_trading_system.strategy.market_maker import MMStrategy
 from .kraken_client import KrakenClient
 from .order_book import OrderBook
@@ -11,7 +12,7 @@ from logging import Logger
 import asyncio
 
 class KrakenWS(SpotWSClient):
-    def __init__(self, key: str, secret: str, client: KrakenClient, paper_engine: PaperEngine, market_maker: MMStrategy, executor: Executor, pnl_tracker: PnLTracker, logger: Logger):
+    def __init__(self, key: str, secret: str, client: KrakenClient, paper_engine: PaperEngine, market_maker: MMStrategy, executor: Executor, pnl_tracker: PnLTracker, risk_manager: RiskManager, logger: Logger):
         super().__init__(key=key, secret=secret)
         self.currencies = []
         self.currency_info = {}
@@ -21,6 +22,7 @@ class KrakenWS(SpotWSClient):
         self.market_maker = market_maker
         self.executor = executor
         self.pnl_tracker = pnl_tracker
+        self.risk_manager = risk_manager
         self.logger = logger
 
 
@@ -39,6 +41,7 @@ class KrakenWS(SpotWSClient):
                 self.paper_engine,
                 self.market_maker,
                 self.executor,
+                self.risk_manager,
                 self.pnl_tracker
             )
             for c in self.currencies

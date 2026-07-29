@@ -2,6 +2,7 @@ from ...kraken_trading_system import config
 from ...kraken_trading_system.execution.executor import Executor
 from ...kraken_trading_system.paper.paper_engine import PaperEngine
 from ...kraken_trading_system.pnl.pnl_tracker import PnLTracker
+from ...kraken_trading_system.risk.risk_manager import RiskManager
 from ...kraken_trading_system.strategy.market_maker import MMStrategy
 from .kraken_client import KrakenClient
 from .websocket_feed import KrakenWS
@@ -9,6 +10,7 @@ from dotenv import load_dotenv
 import asyncio
 import logging
 import os
+import time
 
 # Load environment variables
 load_dotenv()
@@ -16,8 +18,14 @@ API_KEY  = os.getenv("API_KEY")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 
 async def main():
-    # Configures logging
+    # Configure logging
     file_handler = logging.FileHandler(config.MESSAGES_LOG_FILEPATH, mode="w")
+    formatter = logging.Formatter(
+        "%(asctime)s %(levelname)s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S"
+    )
+    formatter.converter = time.gmtime
+    file_handler.setFormatter(formatter)
     m_logger = logging.getLogger(__name__)
     m_logger.setLevel(logging.DEBUG)
     m_logger.addHandler(file_handler)
@@ -27,7 +35,8 @@ async def main():
     market_maker = MMStrategy()
     executor = Executor(client, paper_engine)
     pnl_tracker = PnLTracker(config.PNL_CSV_FILEPATH)
-    ws = KrakenWS(API_KEY, PRIVATE_KEY, client, paper_engine, market_maker, executor, pnl_tracker, m_logger)
+    risk_manager = RiskManager(m_logger)
+    ws = KrakenWS(API_KEY, PRIVATE_KEY, client, paper_engine, market_maker, executor, pnl_tracker, risk_manager, m_logger)
     print("Initialised user client and websocket feed.")
 
     await ws.start()

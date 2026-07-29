@@ -1,24 +1,19 @@
-Rejected sell XRP/USD: volume 23.37387922 exceeds held 0
-Rejected sell BTC/USD: volume 0.00039060 exceeds held 0
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-388.224220915179212970412500
-Rejected sell BTC/USD: volume 0.00039069 exceeds held 0.000389975040
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-1214.945578561526141587658688
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-1628.150270584564562552492709
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-2041.342673977184471704250792
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-2455.100726714738049933564049
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-2868.324647629968606438494887
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-3281.936798610573685637007785
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-3692.392637078216922366313732
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-4109.083963830959241379474050
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-4522.561879404815247670124178
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-4936.394117975054619926553750
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-5353.245629083289180366903786
-Daily loss limit hit. Capital: 9699.538509565769864000100944
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-5768.684464910618307255155045
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-5771.101635760848554465799176
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-5771.591058095257690333743859
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-5767.390334561785141976980636
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-5766.844087843410399497309359
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-5768.483119298949215716060485
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-5769.346121292187349044799556
-Quote rejected: position limit would be breached with the buy action for XRP/USD: $-5769.691389797664906372071962
+2026-07-29 17:48:12 WARNING: Rejected sell XRP/USD: volume 23.29666438 exceeds held 0
+2026-07-29 17:48:12 WARNING: Rejected sell BTC/USD: volume 0.00039132 exceeds held 0
+2026-07-29 17:48:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-386.564409112760922442392500
+2026-07-29 17:49:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-798.110638625972857934747375
+2026-07-29 17:49:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-1209.416551024239138203034750
+2026-07-29 17:50:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-1619.329750454202425464748000
+2026-07-29 17:50:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-2029.758059693512362054949545
+2026-07-29 17:51:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-2441.561162294096226811584695
+2026-07-29 17:51:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-2852.092268716787979311970055
+2026-07-29 17:52:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-2852.844828883970175366466384
+2026-07-29 17:52:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-3265.642946085402460921540361
+2026-07-29 17:53:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-3678.541882223824910441810828
+2026-07-29 17:53:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-4087.527473233918611074925538
+2026-07-29 17:54:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-4496.683172434754941800041013
+2026-07-29 17:54:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-4488.886658957293024084593486
+2026-07-29 17:55:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-4491.846347539171535018977089
+2026-07-29 17:55:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-4900.329191331753010491853669
+2026-07-29 17:56:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-5309.797468229457997704922465
+2026-07-29 17:56:14 ERROR: Daily loss limit hit. Capital: 9699.253509986520429542961717
