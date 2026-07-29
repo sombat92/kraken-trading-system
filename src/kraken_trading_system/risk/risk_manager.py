@@ -1,13 +1,15 @@
 from ...kraken_trading_system import config
 from decimal import Decimal
+from logging import Logger
 
 class RiskManager:
-    def __init__(self):
-        self.max_position = Decimal(str(config.MAX_POSITION_USD))
-        self.daily_loss_limit = Decimal(str(config.DAILY_LOSS_LIMIT))
+    def __init__(self, logger: Logger):
+        self.max_position = config.MAX_POSITION_USD
+        self.daily_loss_limit = config.DAILY_LOSS_LIMIT
         self.starting_capital = None
         self.positions = {}
         self.halted = False
+        self.logger = logger
 
     def set_starting_capital(self, capital: Decimal):
         """Sets starting capital."""
@@ -17,7 +19,7 @@ class RiskManager:
     def check_daily_loss(self, current_capital: Decimal) -> bool:
         """Returns whether trading should halt, based on remaining capital."""
         if current_capital < self.floor:
-            print(f"CRITICAL: Daily loss limit hit. Capital: {current_capital}")
+            self.logger.error(f"Daily loss limit hit. Capital: {current_capital}")
             self.halted = True
         return self.halted
 
@@ -45,7 +47,7 @@ class RiskManager:
             projected = position - volume_usd
 
         if abs(projected) > self.max_position:
-            print(f"Position limit would be breached with the {action} action for {pair}: ${projected}")
+            self.logger.debug(f"Quote rejected: position limit would be breached with the {action} action for {pair}: ${projected}")
             return False
         else:
             return True

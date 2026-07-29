@@ -2,22 +2,25 @@ from ...kraken_trading_system import config
 from ...kraken_trading_system.risk.risk_manager import RiskManager
 from decimal import Decimal
 from itertools import islice
+from logging import Logger
 from sortedcontainers import SortedDict
 import zlib
 
+
 class OrderBook:
-    def __init__(self, symbol: str, price_decimals: int, qty_decimals: int, client, paper_engine, market_maker, executor, pnl_tracker, depth: int = 10, checksum_check: int = 10):
+    def __init__(self, symbol: str, price_decimals: int, qty_decimals: int, logger: Logger, client, paper_engine, market_maker, executor, pnl_tracker, depth: int = 10, checksum_check: int = 10):
         self.asks = SortedDict(lambda k: k)
         self.bids = SortedDict(lambda k: -k)
         self.symbol = symbol
         self.price_decimals = price_decimals
         self.qty_decimals = qty_decimals
+        self.logger = logger
         self.client = client
         self.paper_engine = paper_engine
         self.market_maker = market_maker
         self.executor = executor
         self.pnl_tracker = pnl_tracker
-        self.risk_manager = RiskManager()
+        self.risk_manager = RiskManager(logger)
         self.depth = depth
         self.checksum_check = checksum_check # Check checksum validity every X updates
         self.update_no = 0
@@ -101,9 +104,6 @@ class OrderBook:
         
         self._truncate()
         self._is_ready = True
-  
-        # Output key properties
-        print(f"SNAPSHOT ({self.symbol}): Best bid: {self.best_bid}, Best ask: {self.best_ask}, Mid: {self.mid}, Spread: {self.spread}")
     
 
     def apply_update(self, update: dict) -> None:
@@ -132,8 +132,9 @@ class OrderBook:
             fills = self.paper_engine.check_fills(self) # Gets filled orders on paper engine to be exxecuted
             self.pnl_tracker.write_fills(fills) # Writes filled orders to PnL tracker
 
-            # Output key properties
-            print(f"UPDATE ({self.symbol}): Best bid: {self.best_bid}, Best ask: {self.best_ask}, Mid: {self.mid}, Spread: {self.spread}")
+            # Update risk manager's position based on each order
+            for order in fills.values():
+                self.risk_manager.update_position(order["action"], order["volume"], order["price"], self.symbol)
 
             # If checksum does not match expected checksum, log warning and reinitialise
             if self.update_no % self.checksum_check == 0:
@@ -141,7 +142,7 @@ class OrderBook:
                 computed_checksum = self.compute_checksum()
                 if actual_checksum != computed_checksum:
                     self._is_ready = False
-                    print(f"WARNING: Computed checksum ({computed_checksum}) does not equal actual checksum ({actual_checksum}).")
+                    self.logger.warning(f"Computed checksum ({computed_checksum}) does not equal actual checksum ({actual_checksum}).")
                 self.update_no = 0
             else:
                 self.update_no += 1
@@ -153,6 +154,18 @@ class OrderBook:
         if not self._is_ready or self.mid is None:
             return
         
-        bid, ask = self.market_maker.compute_quotes(self, self.risk_manager.get_position(self.symbol))
-        await self.executor.refresh_quotes(self.symbol, bid, ask, config.ORDER_SIZE_USD)
-        self.risk_manager.check_daily_loss(self.user_balance)
+        try:
+            bid, ask = self.market_maker.compute_quotes(self, self.risk_manager.get_position(self.symbol))
+
+            # Calculates volume of order, rounded to the pair's qty decimals
+            volume = (config.ORDER_SIZE_USD / self.mid).quantize(Decimal(1).scaleb(-self.qty_decimals))
+
+            # If max position in the risk manager would be breached, do not refresh quotes
+            if not self.risk_manager.can_quote("buy", volume*bid, self.symbol) or not self.risk_manager.can_quote("ask", volume*ask, self.symbol):
+                return
+
+            await self.executor.refresh_quotes(self.symbol, bid, ask, volume)
+            self.risk_manager.check_daily_loss(self.user_balance)
+        except Exception:
+            import traceback
+            traceback.print_exc()

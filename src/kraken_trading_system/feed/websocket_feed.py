@@ -7,10 +7,11 @@ from .kraken_client import KrakenClient
 from .order_book import OrderBook
 from decimal import Decimal
 from kraken.spot import SpotWSClient
+from logging import Logger
 import asyncio
 
 class KrakenWS(SpotWSClient):
-    def __init__(self, key: str, secret: str, client: KrakenClient, paper_engine: PaperEngine, market_maker: MMStrategy, executor: Executor, pnl_tracker: PnLTracker):
+    def __init__(self, key: str, secret: str, client: KrakenClient, paper_engine: PaperEngine, market_maker: MMStrategy, executor: Executor, pnl_tracker: PnLTracker, logger: Logger):
         super().__init__(key=key, secret=secret)
         self.currencies = []
         self.currency_info = {}
@@ -20,8 +21,9 @@ class KrakenWS(SpotWSClient):
         self.market_maker = market_maker
         self.executor = executor
         self.pnl_tracker = pnl_tracker
+        self.logger = logger
 
-    
+
     def configure(self, currencies: list[str], currency_info: dict[str, dict]):
         """Updates KrakenWS to include the currencies being used.
         Initialises the order book for each currency."""
@@ -32,6 +34,7 @@ class KrakenWS(SpotWSClient):
                 c,
                 self.currency_info[c]["pair_decimals"],
                 self.currency_info[c]["lot_decimals"],
+                self.logger,
                 self.client,
                 self.paper_engine,
                 self.market_maker,

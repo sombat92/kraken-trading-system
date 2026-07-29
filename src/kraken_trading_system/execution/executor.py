@@ -20,7 +20,7 @@ class Executor:
         self.active_orders[pair] = {"bid": bid_id, "ask": ask_id}
 
 
-    async def _place(self, pair: str, side: str, price: float, size: Decimal, retries: int = 3):
+    async def _place(self, pair: str, side: str, price: Decimal, size: Decimal, retries: int = 3):
         """Places a single order. Uses an exponential backoff retry loop."""
         for t in range(1,retries+1):
             try:

@@ -7,6 +7,7 @@ from .kraken_client import KrakenClient
 from .websocket_feed import KrakenWS
 from dotenv import load_dotenv
 import asyncio
+import logging
 import os
 
 # Load environment variables
@@ -15,12 +16,18 @@ API_KEY  = os.getenv("API_KEY")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 
 async def main():
+    # Configures logging
+    file_handler = logging.FileHandler(config.MESSAGES_LOG_FILEPATH, mode="w")
+    m_logger = logging.getLogger(__name__)
+    m_logger.setLevel(logging.DEBUG)
+    m_logger.addHandler(file_handler)
+
     client = KrakenClient(API_KEY, PRIVATE_KEY)
-    paper_engine = PaperEngine()
+    paper_engine = PaperEngine(m_logger)
     market_maker = MMStrategy()
     executor = Executor(client, paper_engine)
     pnl_tracker = PnLTracker(config.PNL_CSV_FILEPATH)
-    ws = KrakenWS(API_KEY, PRIVATE_KEY, client, paper_engine, market_maker, executor, pnl_tracker)
+    ws = KrakenWS(API_KEY, PRIVATE_KEY, client, paper_engine, market_maker, executor, pnl_tracker, m_logger)
     print("Initialised user client and websocket feed.")
 
     await ws.start()
@@ -42,13 +49,13 @@ async def main():
 
         while not ws.exception_occur:
             await asyncio.sleep(5)
+            pnl_tracker.summarise()
   
     finally:
         await executor.cancel_all()
         for task in quote_tasks:
             task.cancel()
         await asyncio.gather(*quote_tasks, return_exceptions=True)
-        await client.client.close()
         await ws.close()
 
 
