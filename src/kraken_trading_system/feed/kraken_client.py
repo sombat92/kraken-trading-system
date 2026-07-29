@@ -3,7 +3,6 @@ from kraken.spot import SpotAsyncClient, User
 
 class KrakenClient:
     def __init__(self, key: str, secret: str):
-        # TO DO: CHECK SpotAsyncClient and async
         self._key = key
         self._secret = secret
         self.user = User(key=key, secret=secret)

@@ -1,19 +1,30 @@
-2026-07-29 17:48:12 WARNING: Rejected sell XRP/USD: volume 23.29666438 exceeds held 0
-2026-07-29 17:48:12 WARNING: Rejected sell BTC/USD: volume 0.00039132 exceeds held 0
-2026-07-29 17:48:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-386.564409112760922442392500
-2026-07-29 17:49:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-798.110638625972857934747375
-2026-07-29 17:49:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-1209.416551024239138203034750
-2026-07-29 17:50:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-1619.329750454202425464748000
-2026-07-29 17:50:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-2029.758059693512362054949545
-2026-07-29 17:51:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-2441.561162294096226811584695
-2026-07-29 17:51:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-2852.092268716787979311970055
-2026-07-29 17:52:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-2852.844828883970175366466384
-2026-07-29 17:52:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-3265.642946085402460921540361
-2026-07-29 17:53:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-3678.541882223824910441810828
-2026-07-29 17:53:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-4087.527473233918611074925538
-2026-07-29 17:54:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-4496.683172434754941800041013
-2026-07-29 17:54:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-4488.886658957293024084593486
-2026-07-29 17:55:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-4491.846347539171535018977089
-2026-07-29 17:55:42 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-4900.329191331753010491853669
-2026-07-29 17:56:12 DEBUG: Quote rejected: position limit would be breached with the buy action for XRP/USD: c-5309.797468229457997704922465
-2026-07-29 17:56:14 ERROR: Daily loss limit hit. Capital: 9699.253509986520429542961717
+2026-07-29 22:08:34 WARNING: Rejected sell XRP/USD: volume 23.23884419 exceeds held 0
+2026-07-29 22:08:34 WARNING: Rejected sell BTC/USD: volume 0.00039096 exceeds held 0
+2026-07-29 22:09:04 WARNING: Rejected sell BTC/USD: volume 0.00039113 exceeds held 0.00039096
+2026-07-29 22:09:04 WARNING: Rejected sell XRP/USD: volume 23.24662343 exceeds held 23.23884419
+2026-07-29 22:09:34 WARNING: Rejected sell BTC/USD: volume 0.00039109 exceeds held 0.00039096
+2026-07-29 22:09:34 WARNING: Rejected sell XRP/USD: volume 23.24489426 exceeds held 23.23884419
+2026-07-29 22:10:04 WARNING: Rejected sell BTC/USD: volume 0.00039122 exceeds held 0.00039096
+2026-07-29 22:10:04 WARNING: Rejected sell XRP/USD: volume 23.25905940 exceeds held 23.23884419
+2026-07-29 22:10:35 WARNING: Rejected sell BTC/USD: volume 0.00039106 exceeds held 0.00039096
+2026-07-29 22:10:35 WARNING: Rejected sell XRP/USD: volume 23.24727193 exceeds held 23.23884419
+2026-07-29 22:11:35 WARNING: Rejected sell XRP/USD: volume 23.25213687 exceeds held 0.00377969
+2026-07-29 22:11:35 WARNING: Rejected sell BTC/USD: volume 0.00039071 exceeds held 1.5E-7
+2026-07-29 22:12:05 WARNING: Rejected sell XRP/USD: volume 23.25127184 exceeds held 0.00377969
+2026-07-29 22:12:05 WARNING: Rejected sell BTC/USD: volume 0.00039086 exceeds held 1.5E-7
+2026-07-29 22:12:35 WARNING: Rejected sell BTC/USD: volume 0.00039084 exceeds held 1.5E-7
+2026-07-29 22:12:35 WARNING: Rejected sell XRP/USD: volume 23.25073124 exceeds held 0.00377969
+2026-07-29 22:13:05 WARNING: Rejected sell BTC/USD: volume 0.00039062 exceeds held 1.5E-7
+2026-07-29 22:13:05 WARNING: Rejected sell XRP/USD: volume 23.24359755 exceeds held 0.00377969
+2026-07-29 22:13:35 WARNING: Rejected sell BTC/USD: volume 0.00039075 exceeds held 1.5E-7
+2026-07-29 22:13:35 WARNING: Rejected sell XRP/USD: volume 23.24932577 exceeds held 0.00377969
+2026-07-29 22:14:05 WARNING: Rejected sell XRP/USD: volume 23.25170435 exceeds held 0.00377969
+2026-07-29 22:14:05 WARNING: Rejected sell BTC/USD: volume 0.00039078 exceeds held 1.5E-7
+2026-07-29 22:14:35 WARNING: Rejected sell BTC/USD: volume 0.00039108 exceeds held 1.5E-7
+2026-07-29 22:14:35 WARNING: Rejected sell XRP/USD: volume 23.26003322 exceeds held 0.00377969
+2026-07-29 22:15:05 WARNING: Rejected sell BTC/USD: volume 0.00039112 exceeds held 1.5E-7
+2026-07-29 22:15:05 WARNING: Rejected sell XRP/USD: volume 23.26068247 exceeds held 0.00377969
+2026-07-29 22:15:36 WARNING: Rejected sell XRP/USD: volume 23.25062312 exceeds held 0.00377969
+2026-07-29 22:15:36 WARNING: Rejected sell BTC/USD: volume 0.00039098 exceeds held 1.5E-7
+2026-07-29 22:16:06 WARNING: Rejected sell XRP/USD: volume 23.26923435 exceeds held 0.00377969
+2026-07-29 22:16:06 WARNING: Rejected sell BTC/USD: volume 0.00039124 exceeds held 1.5E-7

@@ -44,7 +44,7 @@ def test_compute_quotes_satisfies_minimum_spread(mid, position):
 def test_compute_quotes_widens_spread_when_edge_is_too_small(monkeypatch):
     """Tests the widening branch directly: forces 2*EDGE below MIN_SPREAD so that
     compute_quotes must symmetrically widen bid/ask to exactly meet MIN_SPREAD."""
-    monkeypatch.setattr(market_maker.config, "EDGE", 0.00001)  # 2*EDGE (0.002%) < MIN_SPREAD (0.02%)
+    monkeypatch.setattr(market_maker.config, "EDGE", Decimal("0.00001"))  # 2*EDGE (0.002%) < MIN_SPREAD (0.02%)
 
     strategy = MMStrategy()
     mid = Decimal("100")
@@ -52,7 +52,7 @@ def test_compute_quotes_widens_spread_when_edge_is_too_small(monkeypatch):
 
     bid, ask = strategy.compute_quotes(book, Decimal("0"))
 
-    min_spread_required = mid * Decimal(str(market_maker.config.MIN_SPREAD))
+    min_spread_required = mid * market_maker.config.MIN_SPREAD
     assert ask - bid == min_spread_required
     # Widening is symmetric around the reservation price (mid, since position=0).
     assert mid - bid == ask - mid

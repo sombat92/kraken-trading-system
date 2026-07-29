@@ -54,7 +54,7 @@ class PnLTracker:
                 total_fills += 1
                 total_fees += Decimal(row["fee"])
 
-        net_pnl = self.total_pnl - total_fees
+        gross_pnl = self.total_pnl + total_fees
 
         # Print statistics to console
-        print(f"{datetime.now(timezone.utc)} Total fills: {total_fills}, Total fees paid: ${total_fees}, Gross PnL: ${self.total_pnl}, Net PnL: ${net_pnl}")
+        print(f"{datetime.now(timezone.utc)} Total fills: {total_fills}, Total fees paid: ${total_fees}, Gross PnL: ${gross_pnl}, Net PnL: ${self.total_pnl}")

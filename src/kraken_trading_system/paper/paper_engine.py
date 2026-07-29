@@ -68,6 +68,10 @@ class PaperEngine:
         """Checks if any resting orders get crossed. If so, execute the order. Called on every book update."""
         filled = {}
         for order_id, order in list(self.open_orders.items()):
+            # Only use orders using the same pair
+            if order["pair"] != book.symbol:
+                continue
+
             # If there is a willing buyer/seller, execute the order
             if (order["action"] == "buy" and book.best_ask <= order["price"]) or (order["action"] == "sell" and book.best_bid >= order["price"]):
                 if self._execute(order):

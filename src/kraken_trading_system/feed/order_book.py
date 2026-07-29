@@ -154,13 +154,17 @@ class OrderBook:
             return
         
         try:
-            bid, ask = self.market_maker.compute_quotes(self, self.risk_manager.get_position(self.symbol))
+            # Converts USD inventory into a price-scale quantity, proportional to how full position is compared to risk limit
+            position_usd = self.risk_manager.get_position(self.symbol)
+            skew_input = (position_usd / config.MAX_POSITION_USD) * self.mid
+
+            bid, ask = self.market_maker.compute_quotes(self, skew_input)
 
             # Calculates volume of order, rounded to the pair's qty decimals
             volume = (config.ORDER_SIZE_USD / self.mid).quantize(Decimal(1).scaleb(-self.qty_decimals))
 
             # If max position in the risk manager would be breached, do not refresh quotes
-            if not self.risk_manager.can_quote("buy", volume*bid, self.symbol) or not self.risk_manager.can_quote("ask", volume*ask, self.symbol):
+            if not self.risk_manager.can_quote("buy", volume*bid, self.symbol) or not self.risk_manager.can_quote("sell", volume*ask, self.symbol):
                 return
 
             await self.executor.refresh_quotes(self.symbol, bid, ask, volume)

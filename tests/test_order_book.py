@@ -132,7 +132,7 @@ example_snapshots = [
 
 def make_book(snapshot: dict) -> OrderBook:
     pair = snapshot["data"][0]["symbol"]
-    book = OrderBook(pair, 1, 8, MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock())
+    book = OrderBook(pair, 1, 8, MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock())
     return book
 
 
@@ -171,7 +171,7 @@ def test_mid(snapshot: dict):
 @pytest.mark.parametrize("snapshots", [example_snapshots])
 def test_compute_checksum(snapshots: list[dict]):
     """Tests checksum generation method."""
-    book = OrderBook("BTC/USD", 1, 8, MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock())
+    book = OrderBook("BTC/USD", 1, 8, MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock())
     book.apply_snapshot(snapshots[0])
     for i in range(1, len(snapshots)):
         book.apply_update(snapshots[i])
