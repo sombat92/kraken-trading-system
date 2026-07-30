@@ -30,6 +30,14 @@ async def shutdown(executor: Executor, quote_tasks: list[asyncio.Task], ws: Krak
 
 
 async def main():
+    # Check that config's variables are correct
+    if config.EDGE <= 0:
+        raise ValueError("Edge must be positive.")
+    if config.MIN_SPREAD <= 0:
+        raise ValueError("Minimum spread must be positive")
+    if config.MAX_POSITION_USD <= config.ORDER_SIZE_USD:
+        raise ValueError("The maximum position must be greater than the order size.")
+
     # Configure logging
     file_handler = logging.FileHandler(config.MESSAGES_LOG_FILEPATH, mode="w")
     formatter = logging.Formatter(
@@ -44,11 +52,11 @@ async def main():
 
     # Initialise key components
     client = KrakenClient(API_KEY, PRIVATE_KEY)
-    paper_engine = PaperEngine(m_logger)
     market_maker = MMStrategy()
-    executor = Executor(client, paper_engine)
     pnl_tracker = PnLTracker(config.PNL_CSV_FILEPATH)
+    paper_engine = PaperEngine(m_logger, pnl_tracker)
     risk_manager = RiskManager(m_logger)
+    executor = Executor(client, paper_engine)
     ws = KrakenWS(API_KEY, PRIVATE_KEY, client, paper_engine, market_maker, executor, pnl_tracker, risk_manager, m_logger)
     print("Initialised user client and websocket feed.")
 
@@ -76,7 +84,11 @@ async def main():
 
         while not ws.exception_occur:
             await asyncio.sleep(5)
-            pnl_tracker.summarise()
+
+        # If there is an websocket exception, restart the connection
+        await ws.start()
+        m_logger.debug("Websocket connection restarted.")
+        
   
     finally:
         await shutdown(executor, quote_tasks, ws)

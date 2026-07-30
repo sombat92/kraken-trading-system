@@ -22,6 +22,7 @@ class Executor:
 
     async def _place(self, pair: str, side: str, price: Decimal, size: Decimal, retries: int = 3):
         """Places a single order. Uses an exponential backoff retry loop."""
+        await asyncio.sleep(0.1) # Wait 0.1 seconds per order to prevent being rate limited by API
         for t in range(1,retries+1):
             try:
                 if config.PAPER_MODE:
