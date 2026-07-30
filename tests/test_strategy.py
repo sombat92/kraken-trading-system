@@ -133,6 +133,6 @@ def test_compute_quotes_exact_values_with_long_position():
 
     bid, ask = strategy.compute_quotes(book, Decimal("100"))
 
-    # resv_price = 100 - 100*0.75 = 25; edge = 100 * 0.0003 = 0.03
-    assert bid == Decimal("24.97")
-    assert ask == Decimal("25.03")
+    # resv_price = 100 - 100*0.0005 = 99.95; edge = 100 * 0.0003 = 0.03
+    assert bid == Decimal("99.92")
+    assert ask == Decimal("99.98")

@@ -56,7 +56,7 @@ async def main():
     pnl_tracker = PnLTracker(config.PNL_CSV_FILEPATH)
     paper_engine = PaperEngine(m_logger, pnl_tracker)
     risk_manager = RiskManager(m_logger)
-    executor = Executor(client, paper_engine)
+    executor = Executor(client, paper_engine, m_logger)
     ws = KrakenWS(API_KEY, PRIVATE_KEY, client, paper_engine, market_maker, executor, pnl_tracker, risk_manager, m_logger)
     print("Initialised user client and websocket feed.")
 

@@ -2,13 +2,15 @@ from ...kraken_trading_system import config
 from ...kraken_trading_system.feed.kraken_client import KrakenClient
 from ...kraken_trading_system.paper.paper_engine import PaperEngine
 from decimal import Decimal
+from logging import Logger
 import asyncio
 
 
 class Executor:
-    def __init__(self, client: KrakenClient, paper_engine: PaperEngine):
+    def __init__(self, client: KrakenClient, paper_engine: PaperEngine, logger: Logger):
         self.client = client
         self.paper_engine = paper_engine
+        self.logger = logger
         self.active_orders = {}
 
     async def refresh_quotes(self, pair: str, bid: Decimal, ask: Decimal, size: Decimal):
@@ -18,6 +20,7 @@ class Executor:
         bid_id = await self._place(pair, "buy", bid, size)
         ask_id = await self._place(pair, "sell", ask, size)
         self.active_orders[pair] = {"bid": bid_id, "ask": ask_id}
+        self.logger.debug(f"QUOTE {pair} bid={bid} ask={ask}")
 
 
     async def _place(self, pair: str, side: str, price: Decimal, size: Decimal, retries: int = 3):
