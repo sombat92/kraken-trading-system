@@ -13,12 +13,12 @@ class Executor:
         self.logger = logger
         self.active_orders = {}
 
-    async def refresh_quotes(self, pair: str, bid: Decimal, ask: Decimal, size: Decimal):
+    async def refresh_quotes(self, pair: str, bid: Decimal, ask: Decimal, bid_size: Decimal, ask_size: Decimal):
         """Cancels all existing orders for given pair, then places a fresh bid and ask."""
         await self.cancel_pair_orders(pair)
         await asyncio.sleep(0.1) # Sleep a bit between cancelling and placing orders
-        bid_id = await self._place(pair, "buy", bid, size)
-        ask_id = await self._place(pair, "sell", ask, size)
+        bid_id = await self._place(pair, "buy", bid, bid_size)
+        ask_id = await self._place(pair, "sell", ask, ask_size)
         self.active_orders[pair] = {"bid": bid_id, "ask": ask_id}
         self.logger.debug(f"QUOTE {pair} bid={bid} ask={ask}")
 
@@ -26,6 +26,10 @@ class Executor:
     async def _place(self, pair: str, side: str, price: Decimal, size: Decimal, retries: int = 3):
         """Places a single order. Uses an exponential backoff retry loop."""
         await asyncio.sleep(0.1) # Wait 0.1 seconds per order to prevent being rate limited by API
+
+        if size == 0:
+            return None
+
         for t in range(1,retries+1):
             try:
                 if config.PAPER_MODE:

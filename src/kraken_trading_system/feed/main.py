@@ -29,6 +29,32 @@ async def shutdown(executor: Executor, quote_tasks: list[asyncio.Task], ws: Krak
     await ws.close()
 
 
+async def daily_loss_reset_loop(risk_manager: RiskManager, get_current_capital, interval_seconds: int = 86400):
+    """
+    Resets the RiskManager's daily loss limit every `interval_seconds` (default: 24h),
+    starting from the moment this task is created (i.e. program start).
+
+    :param risk_manager: the running RiskManager instance
+    :param get_current_capital: zero-arg callable returning current capital as a Decimal
+                                 (e.g. lambda: paper_engine.balance_usd)
+    :param interval_seconds: how often to reset the window, in seconds (86400 = 24h)
+    """
+    try:
+        while True:
+            await asyncio.sleep(interval_seconds)
+
+            current_capital = get_current_capital()
+            risk_manager.set_starting_capital(current_capital)  # re-bases starting_capital + floor off *today's* opening balance
+            risk_manager.halted = False  # lift any halt carried over from the previous window
+
+            risk_manager.logger.info(
+                f"Daily loss limit window reset. New starting capital: {current_capital}, "
+                f"new floor: {risk_manager.floor}"
+            )
+    except asyncio.CancelledError:
+        return
+
+
 async def main():
     # Check that config's variables are correct
     if config.EDGE <= 0:
@@ -54,7 +80,7 @@ async def main():
     client = KrakenClient(API_KEY, PRIVATE_KEY)
     market_maker = MMStrategy()
     pnl_tracker = PnLTracker(config.PNL_CSV_FILEPATH)
-    paper_engine = PaperEngine(m_logger, pnl_tracker)
+    paper_engine = PaperEngine(m_logger)
     risk_manager = RiskManager(m_logger)
     executor = Executor(client, paper_engine, m_logger)
     ws = KrakenWS(API_KEY, PRIVATE_KEY, client, paper_engine, market_maker, executor, pnl_tracker, risk_manager, m_logger)
@@ -67,6 +93,12 @@ async def main():
     print("Configured websocket feed.")
     
     quote_tasks = [asyncio.create_task(ws._quote_loop(pair)) for pair in config.SYMBOLS]
+    quote_tasks.append(
+        asyncio.create_task(daily_loss_reset_loop(
+            risk_manager,
+            lambda: paper_engine.balance_usd # NOTE: currently only works for paper mode
+        ))
+    )
 
     # Handle graceful shutdown when run as a background service (using SIGTERM). Not on Windows.
     if os.name != "nt":

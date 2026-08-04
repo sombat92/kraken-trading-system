@@ -3,6 +3,7 @@ from decimal import Decimal
 from itertools import islice
 from logging import Logger
 from sortedcontainers import SortedDict
+import traceback
 import zlib
 
 
@@ -131,6 +132,9 @@ class OrderBook:
             fills = self.paper_engine.check_fills(self) # Gets filled orders on paper engine to be exxecuted
             self.pnl_tracker.write_fills(fills) # Writes filled orders to PnL tracker
 
+            if fills:
+                self.pnl_tracker.summarise()
+
             # Update risk manager's position based on each order
             for order in fills.values():
                 self.risk_manager.update_position(order["action"], order["volume"], order["price"], self.symbol)
@@ -160,15 +164,20 @@ class OrderBook:
 
             bid, ask = self.market_maker.compute_quotes(self, skew_input)
 
-            # Calculates volume of order, rounded to the pair's qty decimals
-            volume = (config.ORDER_SIZE_USD / self.mid).quantize(Decimal(1).scaleb(-self.qty_decimals))
+            # Calculates volume of order
+            buy_volume = (config.ORDER_SIZE_USD / self.mid).quantize(Decimal(1).scaleb(-self.qty_decimals))
+            held = self.paper_engine.positions.get(self.symbol, Decimal(0))
+            if held > 0:
+                sell_volume = min(buy_volume, held)
+            else:
+                sell_volume = Decimal(0) # Place no sell order if no currency held
 
             # If max position in the risk manager would be breached, do not refresh quotes
-            if not self.risk_manager.can_quote("buy", volume*bid, self.symbol) or not self.risk_manager.can_quote("sell", volume*ask, self.symbol):
+            if not self.risk_manager.can_quote("buy", buy_volume*bid, self.symbol) or not self.risk_manager.can_quote("sell", sell_volume*ask, self.symbol):
                 return
 
-            await self.executor.refresh_quotes(self.symbol, bid, ask, volume)
+            await self.executor.refresh_quotes(self.symbol, bid, ask, buy_volume, sell_volume)
             self.risk_manager.check_daily_loss(self.user_balance)
+
         except Exception:
-            import traceback
             traceback.print_exc()

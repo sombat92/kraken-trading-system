@@ -38,6 +38,7 @@ class RiskManager:
     def can_quote(self, action: str, volume_usd: Decimal, pair: str) -> bool:
         """Returns whether a given order would cause max position to be breached by a given pair."""
         if self.halted:
+            self.logger.warning(f"Quote rejected: trading halted (daily loss limit breached) for {pair}")
             return False
         
         position = self.get_position(pair)

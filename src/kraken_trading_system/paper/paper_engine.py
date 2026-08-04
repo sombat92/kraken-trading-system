@@ -1,19 +1,20 @@
 from ...kraken_trading_system import config
 from ...kraken_trading_system.feed.order_book import OrderBook
-from ...kraken_trading_system.pnl.pnl_tracker import PnLTracker
 from decimal import Decimal
 from logging import Logger
 from typing import Any
 import uuid
 
 class PaperEngine:
-    def __init__(self, logger: Logger, pnl_tracker: PnLTracker, starting_balance_usd: float = 10000):
+    def __init__(self, logger: Logger, starting_balance_usd: float = 10000):
         self.balance_usd = Decimal(str(starting_balance_usd))
         self.total_fee = Decimal(0) # Total fees accumulated
-        self.positions = {}
+        self.positions = { # Seed the positions with initial inventory
+            "BTC/USD": Decimal("0.05"),
+            "XRP/USD": Decimal("500")
+        }
         self.open_orders = {}
         self.logger = logger
-        self.pnl_tracker = pnl_tracker
 
 
     def _execute(self, order: dict) -> bool:
@@ -79,9 +80,6 @@ class PaperEngine:
                 if self._execute(order):
                     filled[order_id] = order
                     print(f"Order {order_id} executed: {order}")
-
-        if filled:
-            self.pnl_tracker.summarise()
 
         # Clears filled orders from open orders dict
         for order_id in filled:
