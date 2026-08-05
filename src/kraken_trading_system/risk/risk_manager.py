@@ -20,6 +20,7 @@ class RiskManager:
         """Returns whether trading should halt, based on remaining capital."""
         if current_capital < self.floor:
             self.logger.error(f"Daily loss limit hit. Capital: {current_capital}")
+            print("Daily loss limit hit. Stopped trading for the day.")
             self.halted = True
         return self.halted
 
